@@ -1,27 +1,32 @@
+import { useEffect, useState } from "react"
 import { Link, useLoaderData } from "react-router-dom"
 
+
 export default function Careers() {
-  const careers = useLoaderData()
+  const [res,setRes]=useState();
+  useEffect(()=>{
+    getData().then(async (r)=>{
+      setRes(await r.json());
+    });
+  },[]);
+
+async function getData(){
+  const response=await fetch('http://localhost:4000/careers');
+  return response;
+}
+
 
   return (
-    <div className="careers">
-      {careers.map(career => (
+    <>
+    {res&&(<div className="careers">
+      {res.map(career => (
         <Link to={career.id.toString()} key={career.id}>
           <p>{career.title}</p>
           <p>Based in {career.location}</p>
         </Link>
       ))}
-    </div>
+    </div>)}
+    {!res&&(<div>Loading...</div>)}
+    </> 
   )
-}
-
-// data loader
-export const careersLoader = async () => {
-  const res = await fetch('http://localhost:4000/careers')
-
-  if (!res.ok) {
-    throw Error('Could not fetch the list of careers')
-  }
-
-  return res.json()
 }
